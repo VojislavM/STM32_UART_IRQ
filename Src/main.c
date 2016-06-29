@@ -32,7 +32,9 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include "message.h"
 #include <stdio.h>
+
 
 
 /* USER CODE BEGIN Includes */
@@ -137,7 +139,39 @@ int main(void)
   HAL_UART_Receive_IT(&huart1, Rx_data, 1);	//activate uart rx interrupt avery time receiving 1 byte
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
+
+	//TLV test:
+	message_t msg;
+	message_init(&msg);
+	message_tlv_add_command(&msg, COMMAND_GET_STATUS);
+	message_tlv_add_checksum(&msg);
+
+	printf("Generated protocol message: ");
+	message_print(&msg);
+	printf("\n");
+
+	uint8_t buffer[1024];
+	size_t length = message_serialize(buffer, 1024, &msg);
+	printf("Serialized protocol message:\n");
+	for (size_t i = 0; i < length; i++) {
+		printf("%02X ", buffer[i]);
+	}
+	printf("\n");
+
+	message_t msg_parsed;
+	message_result_t result = message_parse(&msg_parsed, buffer, length);
+	if (result == MESSAGE_SUCCESS) {
+		printf("Parsed protocol message: ");
+		message_print(&msg_parsed);
+		printf("\n");
+	} else {
+		printf("Failed to parse serialized message: %d\n", result);
+	}
+
+	message_free(&msg);
+
+
+  while (1);
   {
   /* USER CODE END WHILE */
 	  i = 0;
