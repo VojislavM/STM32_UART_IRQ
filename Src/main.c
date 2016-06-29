@@ -36,9 +36,18 @@
 
 
 /* USER CODE BEGIN Includes */
+#ifdef __GNUC__
+#define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
+#else
+#define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
+#endif /* __GNUC__ */
+
 
 /* USER CODE END Includes */
 
+/* You need this if you want use printf */
+/* Struct FILE is implemented in stdio.h */
+FILE __stdout;
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
@@ -52,14 +61,6 @@ int len;
 char Rx_indx, Rx_data[2], Rx_Buffer[100], Transfer_cplt;
 /* USER CODE END PV */
 
-/* Private function prototypes -----------------------------------------------*/
-#ifdef __GNUC__
-  /* With GCC/RAISONANCE, small printf (option LD Linker->Libraries->Small printf
-     set to 'Yes') calls __io_putchar() */
-  #define PUTCHAR_PROTOTYPE int __io_putchar(int ch)
-#else
-  #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
-#endif /* __GNUC__ */
 
 void SystemClock_Config(void);
 void Error_Handler(void);
@@ -127,11 +128,11 @@ int main(void)
   /* USER CODE END 2 */
   //For sending data out in while(1)
 
-  printf("Hello\r\n");
-  printf("This is i:%i\r\n",i);
+  printf("Hello\r\nKoruza driver \r\n");
+  printf("\n\n");
 
   HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
-  HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
+  //HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
 
   HAL_UART_Receive_IT(&huart1, Rx_data, 1);	//activate uart rx interrupt avery time receiving 1 byte
   /* Infinite loop */
@@ -161,20 +162,12 @@ int main(void)
 
 }
 
-/**
-  * @brief  Retargets the C library printf function to the USART.
-  * @param  None
-  * @retval None
-  */
 PUTCHAR_PROTOTYPE
 {
-  /* Place your implementation of fputc here */
-  /* e.g. write a character to the EVAL_COM1 and Loop until the end of transmission */
   HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
 
   return ch;
 }
-
 /** System Clock Configuration
 */
 void SystemClock_Config(void)
@@ -258,9 +251,9 @@ static void MX_USART2_UART_Init(void)
 
 }
 
-/** Configure pins as 
-        * Analog 
-        * Input 
+/** Configure pins as
+        * Analog
+        * Input
         * Output
         * EVENT_OUT
         * EXTI
@@ -307,10 +300,10 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler */
   /* User can add his own implementation to report the HAL error return state */
-  while(1) 
+  while(1)
   {
   }
-  /* USER CODE END Error_Handler */ 
+  /* USER CODE END Error_Handler */
 }
 
 #ifdef USE_FULL_ASSERT
@@ -335,10 +328,10 @@ void assert_failed(uint8_t* file, uint32_t line)
 
 /**
   * @}
-  */ 
+  */
 
 /**
   * @}
-*/ 
+*/
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
