@@ -44,7 +44,7 @@
 #define PUTCHAR_PROTOTYPE int fputc(int ch, FILE *f)
 #endif /* __GNUC__ */
 
-
+#define RXBUFFERSIZE 100
 /* USER CODE END Includes */
 
 /* You need this if you want use printf */
@@ -107,7 +107,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -125,74 +124,33 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART2_UART_Init();
 
-  /* USER CODE BEGIN 2 */
-  char ch = 'v';
-  /* USER CODE END 2 */
-  //For sending data out in while(1)
 
-  printf("Hello\r\nKoruza driver \r\n");
+  printf("Hello\r\nUART Example \r\n");
   printf("\n\n");
 
-  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
-  //HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
-
   HAL_UART_Receive_IT(&huart1, Rx_data, 1);	//activate uart rx interrupt avery time receiving 1 byte
+
   /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
 
-	//TLV test:
-	message_t msg;
-	message_init(&msg);
-	message_tlv_add_command(&msg, COMMAND_GET_STATUS);
-	message_tlv_add_checksum(&msg);
-
-	printf("Generated protocol message: ");
-	message_print(&msg);
-	printf("\n");
-
-	uint8_t buffer[1024];
-	size_t length = message_serialize(buffer, 1024, &msg);
-	printf("Serialized protocol message:\n");
-	for (size_t i = 0; i < length; i++) {
-		printf("%02X ", buffer[i]);
-	}
-	printf("\n");
-
-	message_t msg_parsed;
-	message_result_t result = message_parse(&msg_parsed, buffer, length);
-	if (result == MESSAGE_SUCCESS) {
-		printf("Parsed protocol message: ");
-		message_print(&msg_parsed);
-		printf("\n");
-	} else {
-		printf("Failed to parse serialized message: %d\n", result);
-	}
-
-	message_free(&msg);
-
-
-  while (1);
+  while (1)
   {
-  /* USER CODE END WHILE */
 	  i = 0;
-	 if (Transfer_cplt != 0)
-		{
+		 if (Transfer_cplt != 0)
+			{
 
-		    HAL_UART_Transmit(&huart1, "t", 1, 1000);
-			sprintf(buffer,"%s\r\n",Rx_Buffer);
-			len=strlen(buffer);
-			HAL_UART_Transmit(&huart1, buffer, len, 1000);
-			Transfer_cplt=0;		//reset transfer_complete variable
-			//HAL_Delay(500);
+			    //HAL_UART_Transmit(&huart1, "t", 1, 1000);
+				sprintf(buffer,"%s\r\n",Rx_Buffer);
+				len=strlen(buffer);
+				HAL_UART_Transmit(&huart1, buffer, len, 1000);
+				printf("\r\n %s", buffer);
+				Transfer_cplt=0;		//reset transfer_complete variable
+				//HAL_Delay(500);
 
-			i++;
-		}
+				i++;
+			}
 
-	  i = 1;
-  /* USER CODE BEGIN 3 */
-
+		  i = 1;
   }
-  /* USER CODE END 3 */
 
 }
 
@@ -202,8 +160,8 @@ PUTCHAR_PROTOTYPE
 
   return ch;
 }
-/** System Clock Configuration
-*/
+/** System Clock Configuration*/
+
 void SystemClock_Config(void)
 {
 
