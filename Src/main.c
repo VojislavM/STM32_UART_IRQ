@@ -144,7 +144,7 @@ int main(void)
 				HAL_UART_Transmit(&huart1, buffer, len, 1000);
 				printf("\r\n %s", buffer);
 				Transfer_cplt=0;		//reset transfer_complete variable
-				//HAL_Delay(500);
+				HAL_Delay(500);
 
 				i++;
 			}
